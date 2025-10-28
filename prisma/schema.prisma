@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  category    String
+  image       String?
+  popular     Boolean  @default(false)
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Restaurant {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  address       Json?
+  contact       Json?
+  deliverySettings Json?
+  operatingHours Json?
+  isOpen        Boolean  @default(true)
+  estimatedPrepTime String @default("25-35 min")
+  logo          String?
+  primaryColor  String   @default("#f97316")
+  secondaryColor String  @default("#ea580c")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("restaurant")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderId         String      @unique
+  items           Json
+  customer        Json
+  deliveryAddress Json
+  payment         Json
+  delivery        Json
+  totals          Json
+  notes           String?
+  status          OrderStatus @default(PENDING)
+  timeline        Json?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model Payment {
+  id            String      @id @default(cuid())
+  orderId       String
+  method        String
+  status        PaymentStatus @default(PENDING)
+  amount        Float
+  pixCode       String?
+  qrCode        String?
+  transactionId String?
+  paidAt        DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+model PromotionalSection {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  displayOrder  Int      @default(0)
+  active        Boolean  @default(true)
+  products      Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("promotional_sections")
+}
