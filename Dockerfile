@@ -36,10 +36,11 @@ RUN adduser --system --uid 1001 nextjs
 # Install Prisma dependencies in production image (needed for migrations and generate)
 RUN apk add --no-cache libc6-compat openssl
 
-# Copy Prisma CLI and related files from deps stage
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.bin/prisma* ./node_modules/.bin/
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# Copy Prisma CLI and all necessary files from builder stage (where it was generated)
+# The Prisma Client was already generated in the builder stage, so copy from there
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma* ./node_modules/.bin/
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma/ ./node_modules/prisma/
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma/ ./node_modules/@prisma/
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
