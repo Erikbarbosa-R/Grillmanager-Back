@@ -6,13 +6,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
-  if (req.method === 'OPTIONS') {
+  if ((req as any).method === 'OPTIONS') {
     res.status(200).end()
     return
   }
 
   try {
-    switch (req.method) {
+    switch ((req as any).method) {
       case 'GET':
         await handleGet(req, res)
         break
