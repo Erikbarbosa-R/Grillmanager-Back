@@ -33,6 +33,14 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install Prisma dependencies in production image (needed for migrations and generate)
+RUN apk add --no-cache libc6-compat openssl
+
+# Copy Prisma CLI and related files from deps stage
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.bin/prisma* ./node_modules/.bin/
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
@@ -43,6 +51,7 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT 3000
+ENV PATH="/app/node_modules/.bin:$PATH"
 
 CMD ["node", "server.js"]
 
