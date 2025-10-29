@@ -11,9 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return
   }
 
-  const { id } = req.query
+  const { orderId } = req.query
 
-  if (!id || typeof id !== 'string') {
+  if (!orderId || typeof orderId !== 'string') {
     return res.status(400).json({
       success: false,
       message: 'ID do pedido é obrigatório'
@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     switch (req.method) {
       case 'PATCH':
-        await handlePatch(req, res, id)
+        await handlePatch(req, res, orderId)
         break
       default:
         res.setHeader('Allow', ['PATCH'])
@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string) {
+async function handlePatch(req: NextApiRequest, res: NextApiResponse, orderId: string) {
   const { status } = req.body
 
   if (!status) {
@@ -45,16 +45,16 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
     })
   }
 
-  const validStatuses = ['PENDING', 'PREPARING', 'READY', 'DELIVERED']
+  const validStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED']
   if (!validStatuses.includes(status)) {
     return res.status(400).json({
       success: false,
-      message: 'Status inválido. Valores aceitos: PENDING, PREPARING, READY, DELIVERED'
+      message: 'Status inválido. Valores aceitos: PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED'
     })
   }
 
   const existingOrder = await prisma.order.findUnique({
-    where: { id }
+    where: { orderId }
   })
 
   if (!existingOrder) {
@@ -64,9 +64,19 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
     })
   }
 
+  const timeline = existingOrder.timeline as any[] || []
+  timeline.push({
+    status: status,
+    timestamp: new Date().toISOString(),
+    message: getStatusMessage(status)
+  })
+
   const updatedOrder = await prisma.order.update({
-    where: { id },
-    data: { status }
+    where: { orderId },
+    data: { 
+      status,
+      timeline 
+    }
   })
 
   res.status(200).json({
@@ -75,3 +85,17 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, id: string
     message: 'Status do pedido atualizado com sucesso'
   })
 }
+
+function getStatusMessage(status: string): string {
+  const messages: { [key: string]: string } = {
+    'PENDING': 'Pedido recebido',
+    'CONFIRMED': 'Pedido confirmado',
+    'PREPARING': 'Pedido em preparação',
+    'READY': 'Pedido pronto para retirada',
+    'OUT_FOR_DELIVERY': 'Pedido saiu para entrega',
+    'DELIVERED': 'Pedido entregue',
+    'CANCELLED': 'Pedido cancelado'
+  }
+  return messages[status] || 'Status atualizado'
+}
+
