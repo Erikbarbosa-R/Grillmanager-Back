@@ -108,11 +108,18 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
             name: restaurantInfo.name,
             description: restaurantInfo.description,
             address: restaurantInfo.address,
-            phone: restaurantInfo.phone,
-            email: restaurantInfo.email,
-            logo: restaurantInfo.logo,
-            primaryColor: restaurantInfo.primaryColor || '#f97316',
-            secondaryColor: restaurantInfo.secondaryColor || '#ea580c',
+            contact: restaurantInfo.contact || (restaurantInfo.phone || restaurantInfo.email ? {
+              phone: restaurantInfo.phone || null,
+              email: restaurantInfo.email || null,
+              whatsapp: restaurantInfo.whatsapp || restaurantInfo.phone || null
+            } : null),
+            deliverySettings: restaurantInfo.deliverySettings || null,
+            operatingHours: restaurantInfo.operatingHours || null,
+            isOpen: restaurantInfo.isOpen !== undefined ? restaurantInfo.isOpen : true,
+            estimatedPrepTime: restaurantInfo.estimatedPrepTime || '25-35 min',
+            logo: restaurantInfo.logo || null,
+            primaryColor: restaurantInfo.primaryColor || restaurantInfo.theme?.primaryColor || '#f97316',
+            secondaryColor: restaurantInfo.secondaryColor || restaurantInfo.theme?.secondaryColor || '#ea580c',
             createdAt: restaurantInfo.createdAt ? new Date(restaurantInfo.createdAt) : new Date(),
             updatedAt: restaurantInfo.updatedAt ? new Date(restaurantInfo.updatedAt) : new Date()
           }

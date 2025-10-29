@@ -124,28 +124,35 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
 
   let restaurant = await prisma.restaurant.findFirst()
 
+  const currentContact = restaurant?.contact as any || {}
+  const updatedContact = {
+    phone: phone !== undefined ? phone : currentContact.phone || null,
+    email: email !== undefined ? email : currentContact.email || null,
+    whatsapp: currentContact.whatsapp || currentContact.phone || null
+  }
+
   if (!restaurant) {
+    const contactData = (phone || email) ? updatedContact : undefined
     restaurant = await prisma.restaurant.create({
       data: {
         name,
         description: description || null,
         address: address || null,
-        phone: phone || null,
-        email: email || null,
+        contact: contactData as any,
         logo: logo || null,
         primaryColor: theme?.primaryColor || '#f97316',
         secondaryColor: theme?.secondaryColor || '#ea580c'
       }
     })
   } else {
+    const contactData = (phone !== undefined || email !== undefined) ? updatedContact : restaurant.contact
     restaurant = await prisma.restaurant.update({
       where: { id: restaurant.id },
       data: {
         name,
         description: description !== undefined ? description : restaurant.description,
         address: address !== undefined ? address : restaurant.address,
-        phone: phone !== undefined ? phone : restaurant.phone,
-        email: email !== undefined ? email : restaurant.email,
+        contact: contactData as any,
         logo: logo !== undefined ? logo : restaurant.logo,
         primaryColor: theme?.primaryColor || restaurant.primaryColor,
         secondaryColor: theme?.secondaryColor || restaurant.secondaryColor
@@ -153,12 +160,13 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
+  const contact = restaurant.contact as any || {}
+
   const formattedRestaurant = {
     name: restaurant.name,
     description: restaurant.description,
     address: restaurant.address,
-    phone: restaurant.phone,
-    email: restaurant.email,
+    contact: contact,
     logo: restaurant.logo,
     theme: {
       primaryColor: restaurant.primaryColor,
