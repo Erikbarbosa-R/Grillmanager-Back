@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "cd .next/standalone && node server.js",
+    "start": "next start",
     "postinstall": "npx prisma generate || true",
     "lint": "next lint",
     "db:generate": "npx prisma generate",
