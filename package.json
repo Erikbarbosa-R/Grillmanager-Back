@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
-    "start": "next start",
+    "build": "next build && node -e \"require('fs').copyFileSync('.next/standalone/server.js','server.js')\"",
+    "start": "node server.js",
     "postinstall": "npx prisma generate || true",
     "lint": "next lint",
     "db:generate": "npx prisma generate",
