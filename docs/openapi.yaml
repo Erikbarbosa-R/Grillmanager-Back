@@ -1,0 +1,414 @@
+openapi: 3.0.3
+info:
+  title: GrillManager API
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /health:
+    get:
+      summary: Status da API
+      responses:
+        '200': { description: OK }
+  /restaurant:
+    get:
+      summary: Obter informações do restaurante
+      responses:
+        '200': { description: OK }
+    put:
+      summary: Atualizar informações do restaurante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+                address: { type: object }
+                phone: { type: string }
+                email: { type: string }
+                logo: { type: string }
+                theme:
+                  type: object
+                  properties:
+                    primaryColor: { type: string }
+                    secondaryColor: { type: string }
+              required: [ name ]
+      responses:
+        '200': { description: Atualizado }
+  /categories:
+    get:
+      summary: Listar categorias
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Criar categoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+                icon: { type: string }
+              required: [ name ]
+      responses:
+        '201': { description: Criada }
+  /categories/{id}:
+    get:
+      summary: Obter categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrada }
+    put:
+      summary: Atualizar categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+                icon: { type: string }
+      responses:
+        '200': { description: Atualizada }
+    delete:
+      summary: Remover categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Removida }
+        '400': { description: Possui produtos associados }
+  /products:
+    get:
+      summary: Listar produtos
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Criar produto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+                price: { type: number }
+                category: { type: string }
+                image: { type: string }
+                popular: { type: boolean }
+                available: { type: boolean }
+              required: [ name, description, price, category ]
+      responses:
+        '201': { description: Criado }
+  /products/{id}:
+    get:
+      summary: Obter produto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    put:
+      summary: Atualizar produto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                description: { type: string }
+                price: { type: number }
+                category: { type: string }
+                image: { type: string }
+                popular: { type: boolean }
+                available: { type: boolean }
+      responses:
+        '200': { description: Atualizado }
+    delete:
+      summary: Remover produto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Removido }
+  /orders:
+    get:
+      summary: Listar pedidos
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Criar pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer: { type: object }
+                deliveryAddress: { type: object }
+                items: { type: array, items: { type: object } }
+                payment: { type: object }
+                delivery: { type: object }
+                totals: { type: object }
+                notes: { type: string }
+              required: [ customer, deliveryAddress, items, totals ]
+      responses:
+        '201': { description: Criado }
+  /orders/{orderId}:
+    get:
+      summary: Detalhar pedido
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+  /orders/{orderId}/status:
+    patch:
+      summary: Atualizar status do pedido
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED]
+              required: [ status ]
+      responses:
+        '200': { description: Atualizado }
+  /payments/pix/generate:
+    post:
+      summary: Gerar cobrança PIX
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId: { type: string }
+                amount: { type: number }
+                description: { type: string }
+              required: [ orderId, amount, description ]
+      responses:
+        '200': { description: OK }
+  /payments/pix/verify:
+    post:
+      summary: Verificar pagamento PIX
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId: { type: string }
+                transactionId: { type: string }
+              required: [ orderId, transactionId ]
+      responses:
+        '200': { description: OK }
+  /delivery/calculate-fee:
+    post:
+      summary: Calcular taxa de entrega
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerAddress: { type: object }
+                orderValue: { type: number }
+              required: [ customerAddress, orderValue ]
+      responses:
+        '200': { description: OK }
+  /geocoding/address-to-coordinates:
+    post:
+      summary: Geocoding de endereço (mock)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address: { type: string }
+              required: [ address ]
+      responses:
+        '200': { description: OK }
+  /promotional-sections:
+    get:
+      summary: Listar seções ativas
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Criar seção promocional
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                description: { type: string }
+                displayOrder: { type: integer }
+                active: { type: boolean }
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId: { type: string }
+                      displayOrder: { type: integer }
+                    required: [ productId, displayOrder ]
+              required: [ title, products ]
+      responses:
+        '201': { description: Criada }
+  /promotional-sections/{id}:
+    get:
+      summary: Detalhar seção
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrada }
+    put:
+      summary: Atualizar seção
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                description: { type: string }
+                displayOrder: { type: integer }
+                active: { type: boolean }
+                products: { type: array, items: { type: object } }
+      responses:
+        '200': { description: Atualizada }
+    delete:
+      summary: Remover seção
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Removida }
+  /settings:
+    get:
+      summary: Obter configurações
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Criar configuração
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key: { type: string }
+                value: { }
+              required: [ key, value ]
+      responses:
+        '201': { description: Criada }
+    put:
+      summary: Atualizar configuração
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key: { type: string }
+                value: { }
+              required: [ key, value ]
+      responses:
+        '200': { description: Atualizada }
+  /import:
+    get:
+      summary: Exportar snapshot
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Importar snapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products: { type: array, items: { type: object } }
+                categories: { type: array, items: { type: object } }
+                restaurantInfo: { type: object }
+                orders: { type: array, items: { type: object } }
+                promotionalSections: { type: array, items: { type: object } }
+              required: [ products, categories, restaurantInfo, orders ]
+      responses:
+        '200': { description: OK }
+  /export:
+    get:
+      summary: Exportar snapshot (atalho)
+      responses:
+        '200': { description: OK }
+
