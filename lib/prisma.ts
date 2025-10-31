@@ -1,3 +1,6 @@
+// Importar env primeiro para garantir que as variáveis sejam carregadas
+import './env';
+
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
