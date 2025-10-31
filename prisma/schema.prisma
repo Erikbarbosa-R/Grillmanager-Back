@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String
   description String
   price       Float
@@ -23,7 +23,7 @@ model Product {
 }
 
 model Category {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String   @unique
   description String?
   icon        String?
@@ -34,7 +34,7 @@ model Category {
 }
 
 model Restaurant {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   name          String
   description   String?
   address       Json?
@@ -53,7 +53,7 @@ model Restaurant {
 }
 
 model Order {
-  id              String      @id @default(cuid())
+  id              String      @id @default(uuid())
   orderId         String      @unique
   items           Json
   customer        Json
@@ -81,7 +81,7 @@ enum OrderStatus {
 }
 
 model Settings {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   key       String   @unique
   value     Json
   createdAt DateTime @default(now())
@@ -91,7 +91,7 @@ model Settings {
 }
 
 model Payment {
-  id            String      @id @default(cuid())
+  id            String      @id @default(uuid())
   orderId       String
   method        String
   status        PaymentStatus @default(PENDING)
@@ -116,7 +116,7 @@ enum PaymentStatus {
 }
 
 model PromotionalSection {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   title         String
   description   String?
   displayOrder  Int      @default(0)
