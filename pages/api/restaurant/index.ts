@@ -1,18 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
+import { setCorsHeaders } from '@/lib/withCors'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  setCorsHeaders(res)
 
-  if ((req as any).method === 'OPTIONS') {
+  if (req.method === 'OPTIONS') {
     res.status(200).end()
     return
   }
 
   try {
-    switch ((req as any).method) {
+    switch (req.method) {
       case 'GET':
         await handleGet(req, res)
         break
@@ -20,16 +19,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await handlePut(req, res)
         break
       default:
+        setCorsHeaders(res)
         res.setHeader('Allow', ['GET', 'PUT'])
         res.status(405).json({ success: false, message: 'Método não permitido' })
     }
   } catch (error) {
     console.error('Erro na API do restaurante:', error)
+    setCorsHeaders(res)
     res.status(500).json({ success: false, message: 'Erro interno do servidor' })
   }
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+  setCorsHeaders(res)
   let restaurant = await prisma.restaurant.findFirst()
 
   if (!restaurant) {
@@ -105,6 +107,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePut(req: NextApiRequest, res: NextApiResponse) {
+  setCorsHeaders(res)
   const { 
     name, 
     description, 

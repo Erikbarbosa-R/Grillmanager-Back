@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
+import { setCorsHeaders } from '@/lib/withCors'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  setCorsHeaders(res)
 
   if (req.method === 'OPTIONS') {
     res.status(200).end()
@@ -20,16 +19,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await handlePost(req, res)
         break
       default:
+        setCorsHeaders(res)
         res.setHeader('Allow', ['GET', 'POST'])
         res.status(405).json({ success: false, message: 'Método não permitido' })
     }
   } catch (error) {
     console.error('Erro na API de categorias:', error)
+    setCorsHeaders(res)
     res.status(500).json({ success: false, message: 'Erro interno do servidor' })
   }
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+  setCorsHeaders(res)
   const categories = await prisma.category.findMany({
     orderBy: { createdAt: 'desc' }
   })
@@ -41,6 +43,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  setCorsHeaders(res)
   const { name, description, icon } = req.body
 
   if (!name) {
