@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -81,7 +82,7 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, orderId: s
     where: { orderId },
     data: { 
       status,
-      timeline: timeline as unknown
+      timeline: timeline as Prisma.InputJsonValue
     }
   })
 
