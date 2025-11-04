@@ -82,7 +82,7 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, orderId: s
     where: { orderId },
     data: { 
       status,
-      timeline: timeline as Prisma.InputJsonValue
+      timeline: (timeline as unknown) as Prisma.InputJsonValue
     }
   })
 

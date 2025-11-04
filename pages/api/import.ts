@@ -130,14 +130,14 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
             id: restaurantInfo.id,
             name: restaurantInfo.name,
             description: restaurantInfo.description,
-            address: restaurantInfo.address as Prisma.InputJsonValue,
-            contact: (restaurantInfo.contact || (restaurantInfo.phone || restaurantInfo.email ? {
+            address: (restaurantInfo.address as unknown) as Prisma.InputJsonValue,
+            contact: ((restaurantInfo.contact || (restaurantInfo.phone || restaurantInfo.email ? {
               phone: restaurantInfo.phone || null,
               email: restaurantInfo.email || null,
               whatsapp: restaurantInfo.whatsapp || restaurantInfo.phone || null
-            } : null)) as Prisma.InputJsonValue,
-            deliverySettings: restaurantInfo.deliverySettings as Prisma.InputJsonValue,
-            operatingHours: restaurantInfo.operatingHours as Prisma.InputJsonValue,
+            } : null)) as unknown) as Prisma.InputJsonValue,
+            deliverySettings: (restaurantInfo.deliverySettings as unknown) as Prisma.InputJsonValue,
+            operatingHours: (restaurantInfo.operatingHours as unknown) as Prisma.InputJsonValue,
             isOpen: restaurantInfo.isOpen !== undefined ? restaurantInfo.isOpen : true,
             estimatedPrepTime: restaurantInfo.estimatedPrepTime || '25-35 min',
             logo: restaurantInfo.logo || null,
@@ -181,15 +181,15 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
           data: orders.map((order: OrderData) => ({
             id: order.id,
             orderId: order.orderId || order.id,
-            items: order.items as Prisma.InputJsonValue,
-            customer: order.customer as Prisma.InputJsonValue,
-            deliveryAddress: order.deliveryAddress as Prisma.InputJsonValue,
-            payment: order.payment as Prisma.InputJsonValue,
-            delivery: order.delivery as Prisma.InputJsonValue,
-            totals: order.totals as Prisma.InputJsonValue,
+            items: (order.items as unknown) as Prisma.InputJsonValue,
+            customer: (order.customer as unknown) as Prisma.InputJsonValue,
+            deliveryAddress: (order.deliveryAddress as unknown) as Prisma.InputJsonValue,
+            payment: (order.payment as unknown) as Prisma.InputJsonValue,
+            delivery: (order.delivery as unknown) as Prisma.InputJsonValue,
+            totals: (order.totals as unknown) as Prisma.InputJsonValue,
             notes: order.notes,
             status: order.status,
-            timeline: order.timeline as Prisma.InputJsonValue,
+            timeline: (order.timeline as unknown) as Prisma.InputJsonValue,
             createdAt: order.createdAt ? new Date(order.createdAt) : new Date(),
             updatedAt: order.updatedAt ? new Date(order.updatedAt) : new Date()
           }))
@@ -204,7 +204,7 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
             description: section.description,
             displayOrder: section.displayOrder || 0,
             active: section.active !== undefined ? section.active : true,
-            products: section.products as Prisma.InputJsonValue,
+            products: (section.products as unknown) as Prisma.InputJsonValue,
             createdAt: section.createdAt ? new Date(section.createdAt) : new Date(),
             updatedAt: section.updatedAt ? new Date(section.updatedAt) : new Date()
           }))

@@ -102,15 +102,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const order = await prisma.order.create({
     data: {
       orderId,
-      items: items as Prisma.InputJsonValue,
-      customer: customer as Prisma.InputJsonValue,
-      deliveryAddress: deliveryAddress as Prisma.InputJsonValue,
-      payment: (payment || { method: 'pix' }) as Prisma.InputJsonValue,
-      delivery: (delivery || { fee: 0, distance: 0 }) as Prisma.InputJsonValue,
-      totals: totals as Prisma.InputJsonValue,
+      items: (items as unknown) as Prisma.InputJsonValue,
+      customer: (customer as unknown) as Prisma.InputJsonValue,
+      deliveryAddress: (deliveryAddress as unknown) as Prisma.InputJsonValue,
+      payment: ((payment || { method: 'pix' }) as unknown) as Prisma.InputJsonValue,
+      delivery: ((delivery || { fee: 0, distance: 0 }) as unknown) as Prisma.InputJsonValue,
+      totals: (totals as unknown) as Prisma.InputJsonValue,
       notes: notes || null,
       status: 'PENDING',
-      timeline: timeline as Prisma.InputJsonValue
+      timeline: (timeline as unknown) as Prisma.InputJsonValue
     }
   })
 

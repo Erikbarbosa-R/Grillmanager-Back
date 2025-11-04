@@ -81,10 +81,10 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     restaurant = await prisma.restaurant.create({
       data: {
         ...defaultData,
-        address: defaultData.address as Prisma.InputJsonValue,
-        contact: defaultData.contact as Prisma.InputJsonValue,
-        deliverySettings: defaultData.deliverySettings as Prisma.InputJsonValue,
-        operatingHours: defaultData.operatingHours as Prisma.InputJsonValue
+        address: (defaultData.address as unknown) as Prisma.InputJsonValue,
+        contact: (defaultData.contact as unknown) as Prisma.InputJsonValue,
+        deliverySettings: (defaultData.deliverySettings as unknown) as Prisma.InputJsonValue,
+        operatingHours: (defaultData.operatingHours as unknown) as Prisma.InputJsonValue
       }
     })
   }
@@ -153,8 +153,8 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
       data: {
         name,
         description: description || null,
-        address: address as Prisma.InputJsonValue,
-        contact: contactData as Prisma.InputJsonValue,
+        address: (address as unknown) as Prisma.InputJsonValue,
+        contact: (contactData as unknown) as Prisma.InputJsonValue,
         logo: logo || null,
         primaryColor: theme?.primaryColor || '#f97316',
         secondaryColor: theme?.secondaryColor || '#ea580c'
@@ -167,8 +167,8 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
       data: {
         name,
         description: description !== undefined ? description : restaurant.description,
-        address: address !== undefined ? (address as Prisma.InputJsonValue) : restaurant.address,
-        contact: contactData as Prisma.InputJsonValue,
+        address: address !== undefined ? ((address as unknown) as Prisma.InputJsonValue) : restaurant.address,
+        contact: (contactData as unknown) as Prisma.InputJsonValue,
         logo: logo !== undefined ? logo : restaurant.logo,
         primaryColor: theme?.primaryColor || restaurant.primaryColor,
         secondaryColor: theme?.secondaryColor || restaurant.secondaryColor
