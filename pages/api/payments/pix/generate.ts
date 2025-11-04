@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    const pixCode = generatePixCode(amount, description)
+    const pixCode = generatePixCode(amount)
     const qrCode = generateQRCode(pixCode)
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000)
 
@@ -69,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-function generatePixCode(amount: number, _description: string): string {
+function generatePixCode(amount: number): string {
   const timestamp = Date.now()
   const randomId = Math.random().toString(36).substring(2, 15)
   
