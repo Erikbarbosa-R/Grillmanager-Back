@@ -42,7 +42,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     }
 
-    const deliverySettings = restaurant.deliverySettings as any || {
+    interface DeliverySettings {
+      baseFee: number
+      perKmFee: number
+      maxDistance: number
+      freeDeliveryMinOrder: number
+    }
+
+    const deliverySettings = (restaurant.deliverySettings as DeliverySettings | null) || {
       baseFee: 5.00,
       perKmFee: 2.00,
       maxDistance: 15.0,

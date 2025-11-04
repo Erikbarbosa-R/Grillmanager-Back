@@ -25,34 +25,66 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     })
 
+    interface OrderTotals {
+      total?: number
+    }
+
+    interface DeliveryInfo {
+      fee?: number
+      distance?: number
+      deliveryZone?: string
+    }
+
+    interface OrderItem {
+      productId: string
+      quantity?: number
+      totalPrice?: number
+      unitPrice?: number
+      name?: string
+    }
+
+    interface ProductStats {
+      productId: string
+      name: string
+      orders: number
+      revenue: number
+    }
+
+    interface ZoneStats {
+      zone: string
+      orders: number
+      totalDistance: number
+      totalFee: number
+    }
+
     const totalOrders = orders.length
     const totalRevenue = orders.reduce((sum, order) => {
-      const totals = order.totals as any
+      const totals = order.totals as OrderTotals | null
       return sum + (totals?.total || 0)
     }, 0)
 
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0
 
     const deliveryOrders = orders.filter(order => {
-      const delivery = order.delivery as any
-      return delivery?.fee > 0
+      const delivery = order.delivery as DeliveryInfo | null
+      return (delivery?.fee || 0) > 0
     })
 
     const totalDeliveries = deliveryOrders.length
     const averageDistance = deliveryOrders.reduce((sum, order) => {
-      const delivery = order.delivery as any
+      const delivery = order.delivery as DeliveryInfo | null
       return sum + (delivery?.distance || 0)
     }, 0) / (totalDeliveries || 1)
 
     const averageDeliveryFee = deliveryOrders.reduce((sum, order) => {
-      const delivery = order.delivery as any
+      const delivery = order.delivery as DeliveryInfo | null
       return sum + (delivery?.fee || 0)
     }, 0) / (totalDeliveries || 1)
 
-    const productStats = new Map()
+    const productStats = new Map<string, ProductStats>()
     
     orders.forEach(order => {
-      const items = order.items as any[]
+      const items = order.items as OrderItem[]
       items.forEach(item => {
         const productId = item.productId
         const quantity = item.quantity || 1
@@ -60,8 +92,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
         if (productStats.has(productId)) {
           const stats = productStats.get(productId)
-          stats.orders += quantity
-          stats.revenue += price
+          if (stats) {
+            stats.orders += quantity
+            stats.revenue += price
+          }
         } else {
           productStats.set(productId, {
             productId,
@@ -77,19 +111,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .sort((a, b) => b.orders - a.orders)
       .slice(0, 10)
 
-    const zoneStats = new Map()
+    const zoneStats = new Map<string, ZoneStats>()
     
     deliveryOrders.forEach(order => {
-      const delivery = order.delivery as any
+      const delivery = order.delivery as DeliveryInfo | null
       const zone = delivery?.deliveryZone || 'zone_001'
       const distance = delivery?.distance || 0
       const fee = delivery?.fee || 0
       
       if (zoneStats.has(zone)) {
         const stats = zoneStats.get(zone)
-        stats.orders += 1
-        stats.totalDistance += distance
-        stats.totalFee += fee
+        if (stats) {
+          stats.orders += 1
+          stats.totalDistance += distance
+          stats.totalFee += fee
+        }
       } else {
         zoneStats.set(zone, {
           zone,

@@ -62,8 +62,6 @@ async function geocodeAddress(address: string) {
 }
 
 function generateMockGeocodingData(address: string) {
-  const addressLower = address.toLowerCase()
-  
   const baseLat = -23.5505
   const baseLng = -46.6333
   

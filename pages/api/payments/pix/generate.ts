@@ -41,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const qrCode = generateQRCode(pixCode)
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000)
 
-    const payment = await prisma.payment.create({
+    await prisma.payment.create({
       data: {
         orderId,
         method: 'pix',
@@ -69,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-function generatePixCode(amount: number, description: string): string {
+function generatePixCode(amount: number, _description: string): string {
   const timestamp = Date.now()
   const randomId = Math.random().toString(36).substring(2, 15)
   

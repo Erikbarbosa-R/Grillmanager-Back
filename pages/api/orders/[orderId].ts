@@ -43,25 +43,69 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       where: { orderId }
     })
 
+    interface CustomerInfo {
+      name?: string
+      phone?: string
+      email?: string
+    }
+
+    interface DeliveryAddress {
+      street?: string
+      number?: string
+      neighborhood?: string
+      city?: string
+      state?: string
+      zipCode?: string
+      coordinates?: {
+        latitude: number
+        longitude: number
+      }
+    }
+
+    interface OrderItem {
+      productId: string
+      name: string
+      quantity: number
+      unitPrice: number
+      totalPrice?: number
+    }
+
+    interface PaymentInfo {
+      method?: string
+    }
+
+    interface DeliveryInfo {
+      fee?: number
+      distance?: number
+      deliveryZone?: string
+      [key: string]: unknown
+    }
+
+    interface TimelineEntry {
+      status: string
+      timestamp: string
+      message: string
+    }
+
     const formattedOrder = {
       orderId: order.orderId,
       status: order.status.toLowerCase(),
-      customer: order.customer as any,
-      deliveryAddress: order.deliveryAddress as any,
-      items: order.items as any[],
+      customer: order.customer as CustomerInfo,
+      deliveryAddress: order.deliveryAddress as DeliveryAddress,
+      items: order.items as OrderItem[],
       payment: {
-        method: (order.payment as any)?.method || 'pix',
+        method: (order.payment as PaymentInfo | null)?.method || 'pix',
         status: payment?.status?.toLowerCase() || 'pending',
         paidAt: payment?.paidAt?.toISOString() || null
       },
       delivery: {
-        ...(order.delivery as any),
+        ...(order.delivery as DeliveryInfo | null),
         deliveryPerson: {
           name: "Maria Santos",
           phone: "(11) 88888-8888"
         }
       },
-      timeline: order.timeline as any[] || [],
+      timeline: (order.timeline as TimelineEntry[] | null) || [],
       estimatedDeliveryTime: calculateEstimatedDeliveryTime(order)
     }
 
@@ -78,9 +122,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-function calculateEstimatedDeliveryTime(order: any): string {
+interface OrderForCalculation {
+  createdAt: Date | string
+  delivery?: {
+    distance?: number
+  } | null
+}
+
+function calculateEstimatedDeliveryTime(order: OrderForCalculation): string {
   const createdAt = new Date(order.createdAt)
-  const delivery = order.delivery as any
+  const delivery = order.delivery as { distance?: number } | null
   const distance = delivery?.distance || 0
   
   const prepTime = 25

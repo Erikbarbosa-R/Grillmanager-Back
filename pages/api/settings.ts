@@ -39,7 +39,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     const settingsObj = settings.reduce((acc, setting) => {
       acc[setting.key] = setting.value
       return acc
-    }, {} as any)
+    }, {} as Record<string, unknown>)
 
     const defaultSettings = {
       delivery: {

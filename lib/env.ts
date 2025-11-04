@@ -4,10 +4,10 @@ import path from 'path';
 
 // Carregar o arquivo .env apenas se não estiver em ambiente Next.js
 // Next.js carrega .env automaticamente, mas precisamos para comandos do Prisma CLI
-// Usar require dinâmico para evitar problemas de build
+// Usar import dinâmico para evitar problemas de build
 if (typeof window === 'undefined' && !process.env.NEXT_PHASE) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const dotenv = require('dotenv');
     dotenv.config({ path: path.resolve(process.cwd(), '.env') });
   } catch (error) {

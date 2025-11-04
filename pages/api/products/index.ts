@@ -23,19 +23,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.setHeader('Allow', ['GET', 'POST'])
         res.status(405).json({ success: false, message: 'Método não permitido' })
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro na API de produtos:', error)
     setCorsHeaders(res)
     
     // Em desenvolvimento, mostra mais detalhes do erro
     const errorMessage = process.env.NODE_ENV === 'development' 
-      ? error?.message || 'Erro interno do servidor'
+      ? (error instanceof Error ? error.message : 'Erro interno do servidor')
       : 'Erro interno do servidor'
     
     res.status(500).json({ 
       success: false, 
       message: errorMessage,
-      ...(process.env.NODE_ENV === 'development' && { error: error?.stack })
+      ...(process.env.NODE_ENV === 'development' && error instanceof Error && { error: error.stack })
     })
   }
 }

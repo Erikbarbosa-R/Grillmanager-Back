@@ -127,8 +127,14 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
 
   let restaurant = await prisma.restaurant.findFirst()
 
-  const currentContact = restaurant?.contact as any || {}
-  const updatedContact = {
+  interface ContactInfo {
+    phone?: string | null
+    email?: string | null
+    whatsapp?: string | null
+  }
+
+  const currentContact = (restaurant?.contact as ContactInfo | null) || {}
+  const updatedContact: ContactInfo = {
     phone: phone !== undefined ? phone : currentContact.phone || null,
     email: email !== undefined ? email : currentContact.email || null,
     whatsapp: currentContact.whatsapp || currentContact.phone || null
@@ -141,7 +147,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
         name,
         description: description || null,
         address: address || null,
-        contact: contactData as any,
+        contact: contactData as ContactInfo,
         logo: logo || null,
         primaryColor: theme?.primaryColor || '#f97316',
         secondaryColor: theme?.secondaryColor || '#ea580c'
@@ -155,7 +161,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
         name,
         description: description !== undefined ? description : restaurant.description,
         address: address !== undefined ? address : restaurant.address,
-        contact: contactData as any,
+        contact: contactData as ContactInfo,
         logo: logo !== undefined ? logo : restaurant.logo,
         primaryColor: theme?.primaryColor || restaurant.primaryColor,
         secondaryColor: theme?.secondaryColor || restaurant.secondaryColor
@@ -163,7 +169,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const contact = restaurant.contact as any || {}
+  const contact = (restaurant.contact as ContactInfo | null) || {}
 
   const formattedRestaurant = {
     name: restaurant.name,

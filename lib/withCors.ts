@@ -7,7 +7,9 @@ export function setCorsHeaders(res: NextApiResponse) {
   res.setHeader('Access-Control-Max-Age', '86400')
 }
 
-export function withCors(handler: Function) {
+type ApiHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void
+
+export function withCors(handler: ApiHandler) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     setCorsHeaders(res)
 

@@ -71,9 +71,31 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
       await tx.restaurant.deleteMany()
       await tx.promotionalSection.deleteMany()
 
+      interface CategoryData {
+        id: string
+        name: string
+        description?: string | null
+        icon?: string | null
+        createdAt?: string | Date
+        updatedAt?: string | Date
+      }
+
+      interface ProductData {
+        id: string
+        name: string
+        description: string
+        price: number
+        category: string
+        image?: string | null
+        popular?: boolean
+        available?: boolean
+        createdAt?: string | Date
+        updatedAt?: string | Date
+      }
+
       if (categories.length > 0) {
         await tx.category.createMany({
-          data: categories.map((cat: any) => ({
+          data: categories.map((cat: CategoryData) => ({
             id: cat.id,
             name: cat.name,
             description: cat.description,
@@ -86,7 +108,7 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
 
       if (products.length > 0) {
         await tx.product.createMany({
-          data: products.map((prod: any) => ({
+          data: products.map((prod: ProductData) => ({
             id: prod.id,
             name: prod.name,
             description: prod.description,
@@ -126,9 +148,36 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
+      interface OrderData {
+        id: string
+        orderId?: string
+        items: unknown
+        customer: unknown
+        deliveryAddress?: unknown
+        payment?: unknown
+        delivery?: unknown
+        totals?: unknown
+        notes?: string | null
+        status: string
+        timeline?: unknown
+        createdAt?: string | Date
+        updatedAt?: string | Date
+      }
+
+      interface PromotionalSectionData {
+        id: string
+        title: string
+        description?: string | null
+        displayOrder?: number
+        active?: boolean
+        products: unknown
+        createdAt?: string | Date
+        updatedAt?: string | Date
+      }
+
       if (orders.length > 0) {
         await tx.order.createMany({
-          data: orders.map((order: any) => ({
+          data: orders.map((order: OrderData) => ({
             id: order.id,
             orderId: order.orderId || order.id,
             items: order.items,
@@ -148,7 +197,7 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
 
       if (promotionalSections && promotionalSections.length > 0) {
         await tx.promotionalSection.createMany({
-          data: promotionalSections.map((section: any) => ({
+          data: promotionalSections.map((section: PromotionalSectionData) => ({
             id: section.id,
             title: section.title,
             description: section.description,

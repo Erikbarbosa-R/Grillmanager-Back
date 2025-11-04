@@ -64,7 +64,13 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, orderId: s
     })
   }
 
-  const timeline = existingOrder.timeline as any[] || []
+  interface TimelineEntry {
+    status: string
+    timestamp: string
+    message: string
+  }
+
+  const timeline = (existingOrder.timeline as TimelineEntry[] | null) || []
   timeline.push({
     status: status,
     timestamp: new Date().toISOString(),

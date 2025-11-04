@@ -107,7 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-async function verifyPixPayment(transactionId: string): Promise<boolean> {
+async function verifyPixPayment(_transactionId: string): Promise<boolean> {
   return Math.random() > 0.3
 }
 

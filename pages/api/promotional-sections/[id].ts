@@ -53,9 +53,15 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse, id: string) 
     })
   }
 
-  const products = section.products as any[]
+  interface ProductRef {
+    productId: string
+    displayOrder?: number
+    [key: string]: unknown
+  }
+
+  const products = section.products as ProductRef[]
   const productDetails = await Promise.all(
-    products.map(async (productRef: any) => {
+    products.map(async (productRef: ProductRef) => {
       const product = await prisma.product.findUnique({
         where: { id: productRef.productId }
       })

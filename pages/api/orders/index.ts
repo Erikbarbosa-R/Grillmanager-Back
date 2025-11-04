@@ -138,7 +138,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 function generateOrderId(): string {
   const now = new Date()
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '')
-  const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '')
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
   
   return `ORD-${dateStr}-${random}`
