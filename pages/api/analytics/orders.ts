@@ -59,32 +59,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const totalOrders = orders.length
     const totalRevenue = orders.reduce((sum, order) => {
-      const totals = order.totals as OrderTotals | null
+      const totals = (order.totals as unknown) as OrderTotals | null
       return sum + (totals?.total || 0)
     }, 0)
 
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0
 
     const deliveryOrders = orders.filter(order => {
-      const delivery = order.delivery as DeliveryInfo | null
+      const delivery = (order.delivery as unknown) as DeliveryInfo | null
       return (delivery?.fee || 0) > 0
     })
 
     const totalDeliveries = deliveryOrders.length
     const averageDistance = deliveryOrders.reduce((sum, order) => {
-      const delivery = order.delivery as DeliveryInfo | null
+      const delivery = (order.delivery as unknown) as DeliveryInfo | null
       return sum + (delivery?.distance || 0)
     }, 0) / (totalDeliveries || 1)
 
     const averageDeliveryFee = deliveryOrders.reduce((sum, order) => {
-      const delivery = order.delivery as DeliveryInfo | null
+      const delivery = (order.delivery as unknown) as DeliveryInfo | null
       return sum + (delivery?.fee || 0)
     }, 0) / (totalDeliveries || 1)
 
     const productStats = new Map<string, ProductStats>()
     
     orders.forEach(order => {
-      const items = order.items as OrderItem[]
+      const items = (order.items as unknown) as OrderItem[]
       items.forEach(item => {
         const productId = item.productId
         const quantity = item.quantity || 1
@@ -114,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const zoneStats = new Map<string, ZoneStats>()
     
     deliveryOrders.forEach(order => {
-      const delivery = order.delivery as DeliveryInfo | null
+      const delivery = (order.delivery as unknown) as DeliveryInfo | null
       const zone = delivery?.deliveryZone || 'zone_001'
       const distance = delivery?.distance || 0
       const fee = delivery?.fee || 0
