@@ -167,7 +167,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
       data: {
         name,
         description: description !== undefined ? description : restaurant.description,
-        address: address !== undefined ? ((address as unknown) as Prisma.InputJsonValue) : restaurant.address,
+        address: address !== undefined ? ((address as unknown) as Prisma.InputJsonValue) : ((restaurant.address as unknown) as Prisma.InputJsonValue),
         contact: (contactData as unknown) as Prisma.InputJsonValue,
         logo: logo !== undefined ? logo : restaurant.logo,
         primaryColor: theme?.primaryColor || restaurant.primaryColor,
