@@ -129,14 +129,14 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
             id: restaurantInfo.id,
             name: restaurantInfo.name,
             description: restaurantInfo.description,
-            address: restaurantInfo.address,
-            contact: restaurantInfo.contact || (restaurantInfo.phone || restaurantInfo.email ? {
+            address: restaurantInfo.address as unknown,
+            contact: (restaurantInfo.contact || (restaurantInfo.phone || restaurantInfo.email ? {
               phone: restaurantInfo.phone || null,
               email: restaurantInfo.email || null,
               whatsapp: restaurantInfo.whatsapp || restaurantInfo.phone || null
-            } : null),
-            deliverySettings: restaurantInfo.deliverySettings || null,
-            operatingHours: restaurantInfo.operatingHours || null,
+            } : null)) as unknown,
+            deliverySettings: restaurantInfo.deliverySettings as unknown,
+            operatingHours: restaurantInfo.operatingHours as unknown,
             isOpen: restaurantInfo.isOpen !== undefined ? restaurantInfo.isOpen : true,
             estimatedPrepTime: restaurantInfo.estimatedPrepTime || '25-35 min',
             logo: restaurantInfo.logo || null,
@@ -180,15 +180,15 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
           data: orders.map((order: OrderData) => ({
             id: order.id,
             orderId: order.orderId || order.id,
-            items: order.items,
-            customer: order.customer,
-            deliveryAddress: order.deliveryAddress,
-            payment: order.payment,
-            delivery: order.delivery,
-            totals: order.totals,
+            items: order.items as unknown,
+            customer: order.customer as unknown,
+            deliveryAddress: order.deliveryAddress as unknown,
+            payment: order.payment as unknown,
+            delivery: order.delivery as unknown,
+            totals: order.totals as unknown,
             notes: order.notes,
             status: order.status,
-            timeline: order.timeline,
+            timeline: order.timeline as unknown,
             createdAt: order.createdAt ? new Date(order.createdAt) : new Date(),
             updatedAt: order.updatedAt ? new Date(order.updatedAt) : new Date()
           }))
@@ -203,7 +203,7 @@ async function handleImport(req: NextApiRequest, res: NextApiResponse) {
             description: section.description,
             displayOrder: section.displayOrder || 0,
             active: section.active !== undefined ? section.active : true,
-            products: section.products,
+            products: section.products as unknown,
             createdAt: section.createdAt ? new Date(section.createdAt) : new Date(),
             updatedAt: section.updatedAt ? new Date(section.updatedAt) : new Date()
           }))

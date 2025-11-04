@@ -78,7 +78,13 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     }
 
     restaurant = await prisma.restaurant.create({
-      data: defaultData
+      data: {
+        ...defaultData,
+        address: defaultData.address as unknown,
+        contact: defaultData.contact as unknown,
+        deliverySettings: defaultData.deliverySettings as unknown,
+        operatingHours: defaultData.operatingHours as unknown
+      }
     })
   }
 
@@ -146,8 +152,8 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
       data: {
         name,
         description: description || null,
-        address: address || null,
-        contact: contactData as ContactInfo,
+        address: address as unknown,
+        contact: contactData as unknown,
         logo: logo || null,
         primaryColor: theme?.primaryColor || '#f97316',
         secondaryColor: theme?.secondaryColor || '#ea580c'
@@ -160,8 +166,8 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse) {
       data: {
         name,
         description: description !== undefined ? description : restaurant.description,
-        address: address !== undefined ? address : restaurant.address,
-        contact: contactData as ContactInfo,
+        address: address !== undefined ? (address as unknown) : restaurant.address,
+        contact: contactData as unknown,
         logo: logo !== undefined ? logo : restaurant.logo,
         primaryColor: theme?.primaryColor || restaurant.primaryColor,
         secondaryColor: theme?.secondaryColor || restaurant.secondaryColor

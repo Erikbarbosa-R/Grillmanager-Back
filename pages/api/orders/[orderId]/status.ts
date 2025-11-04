@@ -70,7 +70,7 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, orderId: s
     message: string
   }
 
-  const timeline = (existingOrder.timeline as TimelineEntry[] | null) || []
+  const timeline = ((existingOrder.timeline as unknown) as TimelineEntry[] | null) || []
   timeline.push({
     status: status,
     timestamp: new Date().toISOString(),
@@ -81,7 +81,7 @@ async function handlePatch(req: NextApiRequest, res: NextApiResponse, orderId: s
     where: { orderId },
     data: { 
       status,
-      timeline 
+      timeline: timeline as unknown
     }
   })
 
